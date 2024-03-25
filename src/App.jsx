@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import Todo from "./components/Todo";
 import AddTodo from "./components/AddTodo";
 import { useForm } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
+
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addTodo,
+  markTodoDone,
+  removeTodo,
+  updateTodo,
+} from "./features/todoSlice";
 
 const App = () => {
-  const [todos, setTodos] = useState([
-    { id: 1, title: "Test todo", status: false },
-  ]);
+  const dispatch = useDispatch();
+  const allTodos = useSelector((state) => state.todos);
 
   const [isEdit, setIsEdit] = useState({ id: null, editable: false });
 
@@ -21,39 +27,23 @@ const App = () => {
 
   const handleEdit = (e, id) => {
     setIsEdit({ id: id, editable: true });
-    const foundTodoTitle = todos.find((item) => item.id === id).title;
+    const foundTodoTitle = allTodos.find((item) => item.id === id).title;
     setValue("title", foundTodoTitle);
   };
 
   const handleDelete = (e, id) => {
-    const newTodos = todos.filter((item) => item.id !== id);
-    setTodos(newTodos);
+    dispatch(removeTodo(id));
   };
 
   const handleDone = (e, id) => {
-    const updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        return { ...todo, status: !todo.status };
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
+    dispatch(markTodoDone(id));
   };
 
   const onSubmit = (data, e) => {
     if (isEdit.editable) {
-      const updatedTodo = todos.map((todo) => ({
-        ...todo,
-        title: todo.id === isEdit.id ? data.title : todo.title,
-      }));
-      setTodos(updatedTodo);
+      dispatch(updateTodo({ data, id: isEdit.id }));
     } else {
-      const newData = {
-        ...data,
-        id: uuidv4(),
-        status: false,
-      };
-      setTodos([...todos, newData]);
+      dispatch(addTodo(data.title));
     }
     setIsEdit({ id: null, editable: false });
     reset();
@@ -72,7 +62,7 @@ const App = () => {
           className="todo-container border border-slate-900 text-gray-100 text-sm 
         rounded-md p-4 h-[calc(100vh-9.375rem)] overflow-auto flex flex-col gap-4"
         >
-          {todos.map((todo, index) => (
+          {allTodos.map((todo, index) => (
             <Todo
               key={todo.id}
               id={todo.id}
