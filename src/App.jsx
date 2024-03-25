@@ -72,17 +72,25 @@ const App = () => {
           className="todo-container border border-slate-900 text-gray-100 text-sm 
         rounded-md p-4 h-[calc(100vh-9.375rem)] overflow-auto flex flex-col gap-4"
         >
-          {todos.map((todo, index) => (
-            <Todo
-              key={todo.id}
-              id={todo.id}
-              status={todo.status}
-              handleDone={handleDone}
-              title={todo.title}
-              handleEdit={handleEdit}
-              handleDelete={handleDelete}
-            />
-          ))}
+          {todos.length > 0 ? (
+            <>
+              {todos.map((todo, index) => (
+                <Todo
+                  key={todo.id}
+                  id={todo.id}
+                  status={todo.status}
+                  handleDone={handleDone}
+                  title={todo.title}
+                  handleEdit={handleEdit}
+                  handleDelete={handleDelete}
+                />
+              ))}
+            </>
+          ) : (
+            <div className="flex justify-center text-slate-500">
+              <p>No Todos to show, Please create a TODO.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
